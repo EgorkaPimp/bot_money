@@ -11,10 +11,13 @@ async def main():
     bot = Bot(token=my_token)
     dp = Dispatcher()
 
+    from callback_button import register_callbacks
     from handlers import register_handlers
+    register_callbacks(dp)
     await register_handlers(dp)
 
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
