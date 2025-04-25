@@ -5,7 +5,7 @@ def init_db():
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS registered (
+            CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
                 nickname TEXT,
@@ -22,7 +22,7 @@ async def add_user(user_id, nick_name, name,
     init_db()
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO registered (user_id, nickname, name, "
+        cursor.execute("INSERT INTO user (user_id, nickname, name, "
                        "last_name, date, time_register)"
                        "VALUES (?, ?, ?, ?, ?, ?)",
                        (user_id, nick_name, name,
