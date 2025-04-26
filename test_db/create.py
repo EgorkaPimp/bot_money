@@ -11,7 +11,7 @@ last_name = 'gorelov'
 date = 'segodnya'
 time_register = '11:11'
 
-cat = 'test_delite'
+cat = 'test_'
 
 def delete(user_id):
     with sqlite3.connect('test.db') as conn:
@@ -25,16 +25,7 @@ def main(nick = None):
     if nick is None:
         nick = f'new_user{random.randint(1000, 100000)}'
     add_user(user_id, nick, name, last_name, date, time_register)
-    category(cat, user_id, nick_name)
-    category(cat, user_id, nick_name)
-    category(cat, user_id, nick_name)
-    category(cat, user_id, nick_name)
-    category(cat, user_id, nick_name)
-    category(cat, user_id, nick_name)
-
-    delete(user_id)
-
-
-
+    for i in range(10):
+        category(f'{cat}{i}', user_id, nick)
 
 main()

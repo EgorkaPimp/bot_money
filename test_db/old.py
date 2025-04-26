@@ -1,35 +1,8 @@
 import logging
 import sqlite3
-from serch_match import user_exists
+from serch_match import user_exists, user_base_categories_exp_exists, user_base_categories_inc_exists
+from create_db import init_db
 
-def init_db():
-    with sqlite3.connect('test.db') as conn:
-        conn.execute("PRAGMA foreign_keys = ON")
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS register_users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_token INTEGER UNIQUE,
-                nick_name TEXT,
-                name TEXT,
-                last_name TEXT,
-                date TEXT,
-                time_register TEXT
-            )
-        ''')
-        conn.commit()
-
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS type_category (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_token INTEGER,
-                nick_name TEXT,
-                category TEXT,
-                FOREIGN KEY (user_token) REFERENCES register_users(user_token)
-                    ON DELETE CASCADE
-            )
-        ''')
-        conn.commit()
 
 def add_user(user_id, nick_name, name,
              last_name, date, time_register):
@@ -46,13 +19,41 @@ def add_user(user_id, nick_name, name,
                            (user_id, nick_name, name,
                             last_name, date, time_register))
             conn.commit()
-            logging.info(f'Add user {name} {last_name}')
+            logging.info(f'Add user {user_id}:{nick_name}')
+            print(f'Add user {user_id}:{name}_{last_name}')
+
+            if user_base_categories_exp_exists(user_id):
+                logging.info(f'Base categories expenses exists')
+                print(f'Base categories expenses exists')
+            else:
+                base_categories = ['food', 'transport', 'entertainment', 'health',
+                                     'clothing', 'home', 'other']
+
+                for category in base_categories:
+                    cursor.execute("INSERT INTO type_categories_expenses (user_token, nick_name, category)"
+                                   "VALUES (?, ?, ?)",
+                                   (user_id, nick_name, category))
+                    conn.commit()
+                logging.info(f'Base categories expenses created')
+                print(f'Base categories expenses created')
+            if user_base_categories_inc_exists(user_id):
+                logging.info(f'Base categories income exists')
+                print(f'Base categories income exists')
+            else:
+                base_categories = ['salary', 'other']
+                for category in base_categories:
+                    cursor.execute("INSERT INTO type_categories_income (user_token, nick_name, category)"
+                                   "VALUES (?, ?, ?)",
+                                   (user_id, nick_name, category))
+                    conn.commit()
+                logging.info(f'Base categories income created')
+                print(f'Base categories income created')
 
 
 def category(cat, user_id, nick_name):
     with sqlite3.connect('test.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO type_category (user_token, nick_name, category)"
+        cursor.execute("INSERT INTO type_categories_expenses (user_token, nick_name, category)"
                        "VALUES (?, ?, ?)",
                        (user_id, nick_name, cat))
         conn.commit()
