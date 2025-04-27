@@ -5,7 +5,8 @@ from aiogram.filters import Filter
 from aiogram.types import CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 
-import db.database
+import db.database, db.serch_match
+import inline_button
 
 router = Router()
 
@@ -18,7 +19,8 @@ class CallbackDataFilter(Filter):
 
 class RegistrationStates(StatesGroup):
     waiting_for_name = State()
-    waiting_for_age = State()
+    add_categories_ex = State()
+    add_categories_inc = State()
 
 @router.callback_query(CallbackDataFilter("reg"))
 async def registration_callback(callback: types.CallbackQuery, state: FSMContext):
@@ -28,7 +30,9 @@ async def registration_callback(callback: types.CallbackQuery, state: FSMContext
 
 @router.callback_query(CallbackDataFilter("view"))
 async def registration_callback(callback: types.CallbackQuery):
-    await callback.message.answer("***********")
+    await callback.message.answer("Вы просматриваете фнкционал, "
+                                  "что бы я нача считать ваши деньгии, "
+                                  "надо зарегистрироватьяс.")
 
 @router.message(RegistrationStates.waiting_for_name)
 async def process_name(message: types.Message):
@@ -38,10 +42,41 @@ async def process_name(message: types.Message):
     user_last_name = message.from_user.last_name
     start_data = (message.date.date()).strftime("%D")
     time_register = (message.date.time()).strftime("%H:%M:%S")
-    await db.database.add_user(user_id, nik_name, user_name,
+    result = await db.database.add_user(user_id, nik_name, user_name,
                                user_last_name, start_data, time_register)
-    await message.answer('Вы успешно зарегистрировались 👏👏👏\n')
+    if result:
+        await message.answer('Вы успешно зарегистрировались 👏👏👏\n')
+    else:
+        nick = db.serch_match.user_nick(user_id)
+        await message.answer(f'Вы уже были зарегестрированы!🫣 \nВаш ник: {nick}\n')
 
+@router.callback_query(CallbackDataFilter("add_category_exp"))
+async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer("Добавление категорий: \n"
+                                  "Введите название:")
+    await state.set_state(RegistrationStates.add_categories_ex)
+
+@router.callback_query(CallbackDataFilter("add_category_inc"))
+async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer("Добавление категорий: \n"
+                                  "Введите название:")
+    await state.set_state(RegistrationStates.add_categories_inc)
+
+@router.message(RegistrationStates.add_categories_ex)
+async def add_cat_exp(message: types.Message):
+    user_id = message.from_user.id
+    category = message.text
+    nick = db.serch_match.user_nick(user_id)
+    await db.database.add_category(category, user_id, nick, 'expenses')
+    await message.answer(f"Категория {category} добавлена")
+
+@router.message(RegistrationStates.add_categories_inc)
+async def add_cat_exp(message: types.Message):
+    user_id = message.from_user.id
+    category = message.text
+    nick = db.serch_match.user_nick(user_id)
+    await db.database.add_category(category, user_id, nick, 'income')
+    await message.answer(f"Категория {category} добавлена")
 
 
 
