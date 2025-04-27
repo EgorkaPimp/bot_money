@@ -1,7 +1,7 @@
 import logging
 import sqlite3
 from serch_match import user_exists, user_base_categories_exp_exists, user_base_categories_inc_exists
-from create_db import init_db
+from create_db_test import init_db
 
 
 def add_user(user_id, nick_name, name,
@@ -50,10 +50,10 @@ def add_user(user_id, nick_name, name,
                 print(f'Base categories income created')
 
 
-def category(cat, user_id, nick_name):
+def add_category(cat, user_id, nick_name, type_categories):
     with sqlite3.connect('test.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO type_categories_expenses (user_token, nick_name, category)"
+        cursor.execute(f"INSERT INTO type_categories_{type_categories} (user_token, nick_name, category)"
                        "VALUES (?, ?, ?)",
                        (user_id, nick_name, cat))
         conn.commit()
