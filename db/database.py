@@ -50,6 +50,13 @@ async def add_user(user_id, nick_name, name,
                 print(f'Base categories income created')
             return True
 
+def delete_user(user_id):
+    with sqlite3.connect('db/my_money.db') as conn:
+        conn.execute("PRAGMA foreign_keys = ON")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM register_users WHERE user_token = ?", (user_id,))
+        conn.commit()
+
 async def add_category(cat, user_id, nick_name, type_categories):
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
