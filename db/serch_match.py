@@ -37,3 +37,13 @@ def user_nick(user_id: int) -> bool:
         rows.append((cursor.fetchall()[0]))
         nick = (rows[0])[0]
         return nick
+
+def user_categories(user_id: int, category: str, type: str) -> bool:
+    with sqlite3.connect('db/my_money.db') as conn:
+        logging.info(f'id = {user_id} \n'
+                     f'category = {category}')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM type_categories_{type} "
+                       "WHERE user_token = ? AND category = ?",
+                       (user_id, category))
+        return cursor.fetchone() is not None

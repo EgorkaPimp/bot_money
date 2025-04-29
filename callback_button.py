@@ -4,11 +4,14 @@ from aiogram import Router, types
 from aiogram.filters import Filter
 from aiogram.types import CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
+import asyncio
 
 import db.database, db.serch_match
 import inline_button
 
 router = Router()
+
+stop_flag = asyncio.Event()
 
 class CallbackDataFilter(Filter):
     def __init__(self, data: str) -> None:
@@ -63,20 +66,37 @@ async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(RegistrationStates.add_categories_inc)
 
 @router.message(RegistrationStates.add_categories_ex)
-async def add_cat_exp(message: types.Message):
+async def add_cat_exp(message: types.Message, ):
     user_id = message.from_user.id
     category = message.text
-    nick = db.serch_match.user_nick(user_id)
-    await db.database.add_category(category, user_id, nick, 'expenses')
-    await message.answer(f"Категория {category} добавлена")
+    if db.serch_match.user_exists(user_id):
+        nick = db.serch_match.user_nick(user_id)
+        if db.serch_match.user_categories(user_id, category.lower(), 'expenses'):
+            logging.info(f'category user was created')
+            await message.answer(f"Категория {category} уже существует")
+        else:
+            await db.database.add_category(category.lower(), user_id, nick, 'expenses')
+            await message.answer(f"Категория {category} добавлена. \n"
+                                 f"Для ввода следующей категории, введите название\n"
+                                 f"Для остановки введите /stop")
+    else:
+        await  message.answer('Вы не зарегестрированы!\n'
+                              'Для работы с категориями зарегестрируйтесь.\n'
+                              '/register')
 
 @router.message(RegistrationStates.add_categories_inc)
-async def add_cat_exp(message: types.Message):
+async def add_cat_inc(message: types.Message):
     user_id = message.from_user.id
     category = message.text
     nick = db.serch_match.user_nick(user_id)
-    await db.database.add_category(category, user_id, nick, 'income')
-    await message.answer(f"Категория {category} добавлена")
+    if db.serch_match.user_categories(user_id, category.lower(), 'income'):
+        logging.info(f'category user was created')
+        await message.answer(f"Категория {category} уже существует")
+    else:
+        await db.database.add_category(category.lower(), user_id, nick, 'income')
+        await message.answer(f"Категория {category} добавлена. \n"
+                             f"Для ввода следующей категории, введите название\n"
+                             f"Для остановки введите /stop")
 
 
 
