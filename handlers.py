@@ -15,7 +15,8 @@ import callback_button
 async def register_handlers(dp):
     dp.message.register(cmd_start, Command('start'))
     dp.message.register(cmd_help, Command('help'))
-    dp.message.register(cmd_add_category_exp, Command('categories'))
+    dp.message.register(cmd_add_category_exp, Command('categories_exp'))
+    dp.message.register(cmd_add_category_inc, Command('categories_inc'))
     dp.message.register(cmd_del_ac, Command('del_ac'))
     dp.message.register(cmd_stop, Command('stop'))
     dp.message.register(cmd_register, Command('register'))
@@ -41,8 +42,12 @@ async def  cmd_start(message: types.Message):
                          reply_markup=inline_button.start_inline())
 
 async def cmd_add_category_exp(message: types.Message):
-    await message.answer('Время паработать с категориями!',
-                         reply_markup=inline_button.categories_inline())
+    await message.answer('Время поработать с категориями расходов! 💸💸💸',
+                         reply_markup=inline_button.categories_exp())
+
+async def cmd_add_category_inc(message: types.Message):
+    await message.answer('Время поработать с категориями доходов! 💸💸💸',
+                         reply_markup=inline_button.categories_inc())
 
 async def cmd_del_ac(message: types.Message):
     user_id = message.from_user.id

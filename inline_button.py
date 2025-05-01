@@ -14,24 +14,28 @@ def start_inline():
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
-def categories_inline():
+def categories_exp():
     inline_kb_list = [
+        [InlineKeyboardButton(text="Показать категории расходов",
+                              callback_data='view_category_exp')],
+
         [InlineKeyboardButton(text="Добавить категорию расходов",
                               callback_data='add_category_exp')],
 
         [InlineKeyboardButton(text="Удалить категорию расходов",
-                              callback_data='del_category_exp')],
+                              callback_data='del_category_exp')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
-        [InlineKeyboardButton(text="Показать категории расходов",
-                              callback_data='https://github.com/EgorkaPimp')],
+def categories_inc():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="Показать категории доходов",
+                              callback_data='view_category_inc')],
 
         [InlineKeyboardButton(text="Добавить категорию доходов",
                               callback_data='add_category_inc')],
 
         [InlineKeyboardButton(text="Удалить категорию доходов",
-                              callback_data='del_category_inc')],
-
-        [InlineKeyboardButton(text="Показать категории доходов",
-                              callback_data='https://github.com/EgorkaPimp')]
+                              callback_data='del_category_inc')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)

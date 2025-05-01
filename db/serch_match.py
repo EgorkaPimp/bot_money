@@ -28,15 +28,14 @@ def user_base_categories_inc_exists(user_id: int) -> bool:
         return cursor.fetchone() is not None
 
 def user_nick(user_id: int) -> bool:
-    rows = []
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
         cursor.execute(f"SELECT nick_name FROM register_users "
                        "WHERE user_token = ?",
                        (user_id,))
-        rows.append((cursor.fetchall()[0]))
+        rows = cursor.fetchall()
         nick = (rows[0])[0]
-        return nick
+        return nick.title()
 
 def user_categories(user_id: int, category: str, type: str) -> bool:
     with sqlite3.connect('db/my_money.db') as conn:
@@ -47,3 +46,14 @@ def user_categories(user_id: int, category: str, type: str) -> bool:
                        "WHERE user_token = ? AND category = ?",
                        (user_id, category))
         return cursor.fetchone() is not None
+
+def view_categories(user_id, type_category):
+    with sqlite3.connect('db/my_money.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT category FROM type_categories_{type_category} "
+                       "WHERE user_token = ?",
+                       (user_id,))
+        categories = cursor.fetchall()
+        return categories
+
+
