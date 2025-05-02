@@ -42,3 +42,27 @@ def init_db():
                )
            ''')
         conn.commit()
+
+        cursor.execute('''
+               CREATE TABLE IF NOT EXISTS expenses (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   user_token INTEGER,
+                   category TEXT,
+                   sum INTEGER,
+                   FOREIGN KEY (user_token) REFERENCES register_users(user_token)
+                       ON DELETE CASCADE
+               )
+           ''')
+        conn.commit()
+
+        cursor.execute('''
+                       CREATE TABLE IF NOT EXISTS income (
+                           id INTEGER PRIMARY KEY AUTOINCREMENT,
+                           user_token INTEGER,
+                           category TEXT,
+                           sum INTEGER,
+                           FOREIGN KEY (user_token) REFERENCES register_users(user_token)
+                               ON DELETE CASCADE
+                       )
+                   ''')
+        conn.commit()
