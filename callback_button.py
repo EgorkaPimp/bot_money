@@ -1,6 +1,6 @@
 import logging
 from aiogram.fsm.context import FSMContext
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters import Filter
 from aiogram.types import CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
@@ -26,6 +26,8 @@ class RegistrationStates(StatesGroup):
     add_categories_inc = State()
     del_category_exp = State()
     del_category_inc = State()
+    waiting_exp = State()
+    waiting_inc = State()
 
 @router.callback_query(CallbackDataFilter("reg"))
 async def registration_callback(callback: types.CallbackQuery, state: FSMContext):
@@ -57,31 +59,31 @@ async def process_name(message: types.Message):
 
 @router.callback_query(CallbackDataFilter("add_category_exp"))
 async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Добавление категорий: \n"
+    await callback.message.edit_text("Добавление категорий: \n"
                                   "Введите название:")
     await state.set_state(RegistrationStates.add_categories_ex)
 
 @router.callback_query(CallbackDataFilter("add_category_inc"))
 async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Добавление категорий: \n"
+    await callback.message.edit_text("Добавление категорий: \n"
                                   "Введите название:")
     await state.set_state(RegistrationStates.add_categories_inc)
 
 @router.callback_query(CallbackDataFilter("del_category_exp"))
 async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Удаление категорий: \n"
+    await callback.message.edit_text("Удаление категорий: \n"
                                   "Введите название:")
     await state.set_state(RegistrationStates.del_category_exp)
 
 @router.callback_query(CallbackDataFilter("del_category_inc"))
 async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Удаление категорий: \n"
+    await callback.message.edit_text("Удаление категорий: \n"
                                   "Введите название:")
     await state.set_state(RegistrationStates.del_category_inc)
 
 @router.callback_query(CallbackDataFilter("del_category_inc"))
 async def categories_callback(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Удаление категорий: \n"
+    await callback.message.edit_text("Удаление категорий: \n"
                                   "Введите название:")
     await state.set_state(RegistrationStates.del_category_inc)
 
@@ -92,7 +94,7 @@ async def categories_callback(callback: types.CallbackQuery):
     categories = db.serch_match.view_categories(user_id, 'expenses')
     for category in categories:
         view_categories = view_categories + f'.{category[0].title()}' + '\n'
-    await callback.message.answer(f'Ваши категории: \n{view_categories}')
+    await callback.message.edit_text(f'Ваши категории: \n{view_categories}')
 
 @router.callback_query(CallbackDataFilter("view_category_inc"))
 async def categories_callback(callback: types.CallbackQuery):
@@ -101,7 +103,21 @@ async def categories_callback(callback: types.CallbackQuery):
     categories = db.serch_match.view_categories(user_id, 'income')
     for category in categories:
         view_categories = view_categories + f'{category[0].title()}' + '\n'
-    await callback.message.answer(f'Ваши категории: \n{view_categories}')
+    await callback.message.edit_text(f'Ваши категории: \n{view_categories}')
+
+@router.callback_query(F.data.startswith('add_exp_'))
+async def add_exp(callback: types.CallbackQuery, state: FSMContext):
+    category = callback.data.split("_")[-1]
+    await state.update_data(category=category)
+    await state.set_state(RegistrationStates.waiting_exp)
+    await callback.message.edit_text(f"Введите сумму для {category}:")
+
+@router.callback_query(F.data.startswith('add_inc_'))
+async def add_exp(callback: types.CallbackQuery, state: FSMContext):
+    category = callback.data.split("_")[-1]
+    await state.update_data(category=category)
+    await state.set_state(RegistrationStates.waiting_inc)
+    await callback.message.edit_text(f"Введите сумму для {category}:")
 
 @router.message(RegistrationStates.add_categories_ex)
 async def add_cat_exp(message: types.Message, ):
@@ -176,6 +192,22 @@ async def del_cat_inc(message: types.Message):
         await  message.answer('Вы не зарегестрированы!\n'
                               'Для работы с категориями зарегестрируйтесь.\n'
                               '/register')
+
+@router.message(RegistrationStates.waiting_exp)
+async def del_cat_inc(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    data = await state.get_data()
+    category = data['category']
+    sum_exp = message.text
+    await db.database.add_exp(user_id, category, sum_exp, 'expenses')
+
+@router.message(RegistrationStates.waiting_inc)
+async def del_cat_inc(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    data = await state.get_data()
+    category = data['category']
+    sum_exp = message.text
+    await db.database.add_exp(user_id, category, sum_exp, 'income')
 
 def register_callbacks(dp):
     dp.include_router(router)

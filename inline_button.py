@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
+import db
 
 def start_inline():
     inline_kb_list = [
@@ -38,4 +39,24 @@ def categories_inc():
         [InlineKeyboardButton(text="Удалить категорию доходов",
                               callback_data='del_category_inc')]
     ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def add_exp(user_id):
+    categories = db.serch_match.view_categories(user_id, 'expenses')
+    inline_kb_list = []
+    for cat in categories:
+        format_key = []
+        format_key.append(InlineKeyboardButton(text=f"{cat[0].title()}",
+                              callback_data=f'add_exp_{cat[0].title()}'))
+        inline_kb_list.append(format_key)
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
+
+def add_inc(user_id):
+    categories = db.serch_match.view_categories(user_id, 'income')
+    inline_kb_list = []
+    for cat in categories:
+        format_key = []
+        format_key.append(InlineKeyboardButton(text=f"{cat[0].title()}",
+                              callback_data=f'add_inc_{cat[0].title()}'))
+        inline_kb_list.append(format_key)
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)

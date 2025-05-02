@@ -9,6 +9,7 @@ from db.serch_match import user_nick
 from db.database import delete_user
 
 from aiogram.fsm.context import FSMContext
+from callback_button import RegistrationStates
 
 import callback_button
 
@@ -20,6 +21,8 @@ async def register_handlers(dp):
     dp.message.register(cmd_del_ac, Command('del_ac'))
     dp.message.register(cmd_stop, Command('stop'))
     dp.message.register(cmd_register, Command('register'))
+    dp.message.register(cmd_add_exp, Command('add_expense'))
+    dp.message.register(cmd_add_inc, Command('add_income'))
 
 
 
@@ -64,3 +67,11 @@ async def cmd_stop(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer('👌')
     logging.info('add categories stoped')
+
+async def cmd_add_exp(message: types.Message, state: FSMContext):
+    await message.answer('Выберите категорию',
+                         reply_markup=inline_button.add_exp(message.from_user.id))
+
+async def cmd_add_inc(message: types.Message, state: FSMContext):
+    await message.answer('Выберите категорию',
+                         reply_markup=inline_button.add_inc(message.from_user.id))

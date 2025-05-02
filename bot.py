@@ -3,11 +3,13 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
+from db.create_db import init_db
 
 logging.basicConfig(level=logging.INFO)
 my_token = read_file()
 
 async def main():
+    init_db()
     bot = Bot(token=my_token)
     dp = Dispatcher()
 
