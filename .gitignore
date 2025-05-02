@@ -49,4 +49,3 @@ ENV/
 .env.test
 .env.production
 
-token_file.py
