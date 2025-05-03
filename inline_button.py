@@ -78,9 +78,29 @@ def finances_exp():
         [InlineKeyboardButton(text="Показать расходы за год",
                               callback_data='view_fin_ear')],
 
-        [InlineKeyboardButton(text="Показать расходы по конкретной категории",
-                              callback_data='view_fin_cat')]
+        # [InlineKeyboardButton(text="Показать расходы по конкретной категории",
+        #                       callback_data='view_fin_cat')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
+def finances_inc():
+    inline_kb_list = [
+        [InlineKeyboardButton(text="Показать доход за текущий день",
+                              callback_data='fin_day_inc')],
 
+        [InlineKeyboardButton(text="Показать доход за определенный день",
+                              callback_data='fin_pick_day_inc')],
+
+        [InlineKeyboardButton(text="Показать доход за текущий месяц",
+                              callback_data='fin_month_inc')],
+
+        [InlineKeyboardButton(text="Показать доход за определенный месяц",
+                              callback_data='fin_pick_month_inc')],
+
+        [InlineKeyboardButton(text="Показать доход за год",
+                              callback_data='view_fin_ear_inc')],
+
+        # [InlineKeyboardButton(text="Показать доход по конкретной категории",
+        #                       callback_data='view_fin_cat_inc')]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)

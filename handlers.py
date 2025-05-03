@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 from aiogram import types
@@ -9,9 +8,7 @@ from db.serch_match import user_nick
 from db.database import delete_user
 
 from aiogram.fsm.context import FSMContext
-from callback_button import RegistrationStates
 
-import callback_button
 
 async def register_handlers(dp):
     dp.message.register(cmd_start, Command('start'))
@@ -24,6 +21,7 @@ async def register_handlers(dp):
     dp.message.register(cmd_add_exp, Command('add_expense'))
     dp.message.register(cmd_add_inc, Command('add_income'))
     dp.message.register(cmd_finance_exp, Command('finance_exp'))
+    dp.message.register(cmd_finance_inc, Command('finance_inc'))
 
 
 
@@ -80,3 +78,7 @@ async def cmd_add_inc(message: types.Message):
 async def cmd_finance_exp(message: types.Message):
     await message.answer('Выберите категорию для просмотра трат',
                          reply_markup=inline_button.finances_exp())
+
+async def cmd_finance_inc(message: types.Message):
+    await message.answer('Выберите категорию для просмотра доходов',
+                         reply_markup=inline_button.finances_inc())

@@ -65,13 +65,13 @@ async def delete_category(user_id, category, type_category):
         logging.info('Was delite categories')
 
 async def add_exp(user_id, category, sum_exp, data_day,
-                  data_month, comment, type_categories):
+                  data_month, data_year, comment, type_categories):
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
         cursor.execute(f"INSERT INTO {type_categories} "
-                       f"(user_token, category, sum, data_day, data_month, comment)"
-                       "VALUES (?, ?, ?, ?, ?, ?)",
+                       f"(user_token, category, sum, data_day, data_month, data_year, comment)"
+                       "VALUES (?, ?, ?, ?, ?, ?, ?)",
                        (user_id, category.lower(), sum_exp,
-                        data_day, data_month, comment))
+                        data_day, data_month, data_year, comment))
         conn.commit()
         logging.info(f'Add sum')

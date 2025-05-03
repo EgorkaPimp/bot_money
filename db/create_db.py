@@ -50,6 +50,7 @@ def init_db():
                    sum INTEGER,
                    data_day TEXT,
                    data_month TEXT,
+                   data_year TEXT,
                    comment TEXT,
                    FOREIGN KEY (user_token) REFERENCES register_users(user_token)
                        ON DELETE CASCADE
@@ -65,6 +66,7 @@ def init_db():
                    sum INTEGER,
                    data_day TEXT,
                    data_month TEXT,
+                   data_year TEXT,
                    comment TEXT,
                    FOREIGN KEY (user_token) REFERENCES register_users(user_token)
                        ON DELETE CASCADE
