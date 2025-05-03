@@ -1,3 +1,4 @@
+import callback_button_finances
 from token_file import read_file
 import asyncio
 import logging
@@ -16,6 +17,7 @@ async def main():
     from callback_button import register_callbacks
     from handlers import register_handlers
     register_callbacks(dp)
+    callback_button_finances.fin_callbacks(dp)
     await register_handlers(dp)
 
     await dp.start_polling(bot)

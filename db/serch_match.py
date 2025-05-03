@@ -56,4 +56,21 @@ def view_categories(user_id, type_category):
         categories = cursor.fetchall()
         return categories
 
+def search_money_month(user_id, category, data_month, type_category):
+    with sqlite3.connect('db/my_money.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT sum FROM {type_category} "
+                       "WHERE user_token = ? AND category = ? AND data_month = ?",
+                       (user_id, category, data_month))
+        sum_month = cursor.fetchall()
+        return sum_month
 
+def search_money_day(user_id, category, data_month, data_day, type_category):
+    with sqlite3.connect('db/my_money.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT sum FROM {type_category} "
+                       "WHERE user_token = ? AND category = ? "
+                       "AND data_month = ? AND data_day = ?",
+                       (user_id, category, data_month, data_day))
+        sum_month = cursor.fetchall()
+        return sum_month

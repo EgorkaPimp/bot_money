@@ -23,6 +23,7 @@ async def register_handlers(dp):
     dp.message.register(cmd_register, Command('register'))
     dp.message.register(cmd_add_exp, Command('add_expense'))
     dp.message.register(cmd_add_inc, Command('add_income'))
+    dp.message.register(cmd_finance_exp, Command('finance_exp'))
 
 
 
@@ -68,10 +69,14 @@ async def cmd_stop(message: types.Message, state: FSMContext):
     await message.answer('👌')
     logging.info('add categories stoped')
 
-async def cmd_add_exp(message: types.Message, state: FSMContext):
+async def cmd_add_exp(message: types.Message):
     await message.answer('Выберите категорию',
                          reply_markup=inline_button.add_exp(message.from_user.id))
 
-async def cmd_add_inc(message: types.Message, state: FSMContext):
+async def cmd_add_inc(message: types.Message):
     await message.answer('Выберите категорию',
                          reply_markup=inline_button.add_inc(message.from_user.id))
+
+async def cmd_finance_exp(message: types.Message):
+    await message.answer('Выберите категорию для просмотра трат',
+                         reply_markup=inline_button.finances_exp())

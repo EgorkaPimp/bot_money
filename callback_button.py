@@ -5,6 +5,9 @@ from aiogram.filters import Filter
 from aiogram.types import CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 import asyncio
+from CallbackDF import CallbackDataFilter
+
+from pyexpat.errors import messages
 
 import db.database, db.serch_match
 import inline_button
@@ -13,12 +16,6 @@ router = Router()
 
 stop_flag = asyncio.Event()
 
-class CallbackDataFilter(Filter):
-    def __init__(self, data: str) -> None:
-        self.data = data
-
-    async def __call__(self, callback: CallbackQuery) -> bool:
-        return callback.data == self.data
 
 class RegistrationStates(StatesGroup):
     waiting_for_name = State()
@@ -27,7 +24,11 @@ class RegistrationStates(StatesGroup):
     del_category_exp = State()
     del_category_inc = State()
     waiting_exp = State()
+    waiting_data_exp = State()
+    waiting_comment_exp = State()
     waiting_inc = State()
+    waiting_data_inc = State()
+    waiting_comment_inc = State()
 
 @router.callback_query(CallbackDataFilter("reg"))
 async def registration_callback(callback: types.CallbackQuery, state: FSMContext):
@@ -195,19 +196,84 @@ async def del_cat_inc(message: types.Message):
 
 @router.message(RegistrationStates.waiting_exp)
 async def del_cat_inc(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    data = await state.get_data()
-    category = data['category']
     sum_exp = message.text
-    await db.database.add_exp(user_id, category, sum_exp, 'expenses')
+    await state.update_data(sum_exp=sum_exp)
+    await state.set_state(RegistrationStates.waiting_data_exp)
+    await message.answer('Введите дату в формате _ДЕНЬ-МЕСЯЦ_ \n'
+                         'Пример _01-01_ \n'
+                         'Для ввода сегоднящней даты введите _*_',
+                         parse_mode="Markdown")
 
-@router.message(RegistrationStates.waiting_inc)
+@router.message(RegistrationStates.waiting_data_exp)
+async def del_cat_inc(message: types.Message, state: FSMContext):
+    data_exp = message.text
+    if data_exp == "*":
+        data_day = (message.date.date()).strftime("%d")
+        data_month = (message.date.date()).strftime("%m")
+    else:
+        data_day = (data_exp.split('-'))[0]
+        data_month = (data_exp.split('-'))[1]
+    await state.update_data(data_day=data_day,
+                            data_month=data_month)
+    await state.set_state(RegistrationStates.waiting_comment_exp)
+    await message.answer('Введите коментарий к трате:')
+
+@router.message(RegistrationStates.waiting_comment_exp)
 async def del_cat_inc(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     data = await state.get_data()
     category = data['category']
+    sum_exp = data['sum_exp']
+    data_day = data['data_day']
+    data_month = data['data_month']
+    comment = message.text
+    await db.database.add_exp(user_id, category, sum_exp,
+                              data_day, data_month, comment, 'expenses')
+    await message.answer(f'Добавлена трата: \n'
+                         f'*{category}*: {sum_exp} \n'
+                         f'*Дата:* {data_day}/{data_month} \n'
+                         f'_{comment}_', parse_mode="Markdown")
+
+@router.message(RegistrationStates.waiting_inc)
+async def del_cat_inc(message: types.Message, state: FSMContext):
     sum_exp = message.text
-    await db.database.add_exp(user_id, category, sum_exp, 'income')
+    await state.update_data(sum_exp=sum_exp)
+    await state.set_state(RegistrationStates.waiting_data_inc)
+    await message.answer('Введите дату в формате _ДЕНЬ-МЕСЯЦ_ \n'
+                         'Пример _01-01_ \n'
+                         'Для ввода сегоднящней даты введите _*_',
+                         parse_mode="Markdown")
+
+@router.message(RegistrationStates.waiting_data_inc)
+async def del_cat_inc(message: types.Message, state: FSMContext):
+    data_exp = message.text
+    if data_exp == "*":
+        data_day = (message.date.date()).strftime("%d")
+        data_month = (message.date.date()).strftime("%m")
+    else:
+        data_day = (data_exp.split('-'))[0]
+        data_month = (data_exp.split('-'))[1]
+    await state.update_data(data_day=data_day,
+                            data_month=data_month)
+    await state.set_state(RegistrationStates.waiting_comment_inc)
+    await message.answer('Введите коментарий к трате:')
+
+@router.message(RegistrationStates.waiting_comment_inc)
+async def del_cat_inc(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    data = await state.get_data()
+    category = data['category']
+    sum_exp = data['sum_exp']
+    data_day = data['data_day']
+    data_month = data['data_month']
+    comment = message.text
+    await db.database.add_exp(user_id, category, sum_exp,
+                              data_day, data_month, comment, 'income')
+    await message.answer(f'Добавлено поступление: \n'
+                         f'*{category.lower}*: {sum_exp} \n'
+                         f'*Дата:* {data_day}/{data_month} \n'
+                         f'_{comment}_', parse_mode="Markdown")
+
 
 def register_callbacks(dp):
     dp.include_router(router)

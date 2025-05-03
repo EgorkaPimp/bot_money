@@ -1,6 +1,5 @@
 import logging
 import sqlite3
-from .create_db import init_db
 from .serch_match import user_exists
 
 async def add_user(user_id, nick_name, name,
@@ -65,11 +64,14 @@ async def delete_category(user_id, category, type_category):
         conn.commit()
         logging.info('Was delite categories')
 
-async def add_exp(user_id, category, sum_exp, type_categories):
+async def add_exp(user_id, category, sum_exp, data_day,
+                  data_month, comment, type_categories):
     with sqlite3.connect('db/my_money.db') as conn:
         cursor = conn.cursor()
-        cursor.execute(f"INSERT INTO {type_categories} (user_token, category, sum)"
-                       "VALUES (?, ?, ?)",
-                       (user_id, category, sum_exp))
+        cursor.execute(f"INSERT INTO {type_categories} "
+                       f"(user_token, category, sum, data_day, data_month, comment)"
+                       "VALUES (?, ?, ?, ?, ?, ?)",
+                       (user_id, category.lower(), sum_exp,
+                        data_day, data_month, comment))
         conn.commit()
-        logging.info(f'Add expenses')
+        logging.info(f'Add sum')

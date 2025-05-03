@@ -1,4 +1,3 @@
-import logging
 import sqlite3
 
 
@@ -49,6 +48,9 @@ def init_db():
                    user_token INTEGER,
                    category TEXT,
                    sum INTEGER,
+                   data_day TEXT,
+                   data_month TEXT,
+                   comment TEXT,
                    FOREIGN KEY (user_token) REFERENCES register_users(user_token)
                        ON DELETE CASCADE
                )
@@ -56,13 +58,16 @@ def init_db():
         conn.commit()
 
         cursor.execute('''
-                       CREATE TABLE IF NOT EXISTS income (
-                           id INTEGER PRIMARY KEY AUTOINCREMENT,
-                           user_token INTEGER,
-                           category TEXT,
-                           sum INTEGER,
-                           FOREIGN KEY (user_token) REFERENCES register_users(user_token)
-                               ON DELETE CASCADE
-                       )
+               CREATE TABLE IF NOT EXISTS income (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   user_token INTEGER,
+                   category TEXT,
+                   sum INTEGER,
+                   data_day TEXT,
+                   data_month TEXT,
+                   comment TEXT,
+                   FOREIGN KEY (user_token) REFERENCES register_users(user_token)
+                       ON DELETE CASCADE
+               )
                    ''')
         conn.commit()
