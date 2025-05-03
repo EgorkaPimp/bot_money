@@ -49,4 +49,5 @@ ENV/
 .env.test
 .env.production
 
+*.pdf
 token_file.py
