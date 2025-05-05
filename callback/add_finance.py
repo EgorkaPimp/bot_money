@@ -125,7 +125,7 @@ async def del_cat_inc(message: types.Message, state: FSMContext):
     await db.database.add_exp(user_id, category, sum_exp,
                               data_day, data_month, data_year, comment, 'income')
     await message.answer(f'Добавлено поступление: \n'
-                         f'*{category.lower}*: {sum_exp} \n'
+                         f'*{category}*: {sum_exp} \n'
                          f'*Дата:* {data_day}/{data_month}/{data_year} \n'
                          f'_{comment}_', parse_mode="Markdown")
     await state.clear()
