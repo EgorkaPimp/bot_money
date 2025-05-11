@@ -33,7 +33,6 @@ def view_cat(categories, user_id, type_cat, data_month=None, data_day=None, data
                 value = float(sum_cat[0].replace(',', '.'))
             else:
                 value = sum_cat[0]
-            print(value)
             sum_all = sum_all + value
         view_map.setdefault(category[0], sum_all)
     for i in view_map:

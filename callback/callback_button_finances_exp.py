@@ -33,7 +33,11 @@ def view_cat(categories, user_id, type_cat, data_month=None, data_day=None, data
                                                     data_month, data_day, data_year, type_cat)
         sum_all = 0
         for sum_cat in sum_month:
-            sum_all = sum_all + sum_cat[0]
+            if ',' in sum_cat[0]:
+                value = float(sum_cat[0].replace(',', '.'))
+            else:
+                value = sum_cat[0]
+            sum_all = sum_all + value
         moneys.append(sum_all)
         view_map.setdefault(category[0], sum_all)
     graph = create_graph.cmd_graph(categories, moneys, user_id)
