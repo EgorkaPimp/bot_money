@@ -51,3 +51,5 @@ ENV/
 
 *.pdf
 token_file.py
+
+vosk-model-ru-0.42
