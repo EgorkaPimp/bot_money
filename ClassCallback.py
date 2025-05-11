@@ -2,8 +2,7 @@ import db.database, db.serch_match
 import create_graph
 import os
 
-class View():
-
+class View:
     def view_cat(categories, user_id, type_cat, data_month=None, data_day=None, data_year=None):
         view_map = {}
         view_end = ""
