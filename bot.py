@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import callback.callback_button_register
 import callback.callback_button_categories_exp
 import callback.callback_button_finances_exp
@@ -31,4 +33,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print(f"script interrupted: {datetime.now()}")
